@@ -85,9 +85,16 @@ public final class MobArena implements SingleInstanceArena {
             new Kit(List.of(ItemStack.of(Material.BOW), ItemStack.of(Material.ARROW)),
                     Map.of(EquipmentSlot.CHESTPLATE, ItemStack.of(Material.LEATHER_CHESTPLATE).withTag(ARMOR_TAG, 3))),
             10);
+    private static final ArenaClass GOD_CLASS = new ArenaClass("God", "Become God.",
+            Icons.STAR, TextColor.color(0xf9ff87), Material.ENCHANTED_GOLDEN_APPLE,
+            new Kit(List.of(ItemStack.of(Material.ENCHANTED_GOLDEN_APPLE).withTag(MELEE_TAG, 1000)),
+                    Map.of(EquipmentSlot.CHESTPLATE, ItemStack.of(Material.DIAMOND_CHESTPLATE).withTag(ARMOR_TAG, 100),
+                            EquipmentSlot.LEGGINGS, ItemStack.of(Material.GOLDEN_LEGGINGS).withTag(ARMOR_TAG, 100))),
+            1);
     public static final List<ArenaClass> CLASSES = List.of(
             KNIGHT_CLASS,
             ARCHER_CLASS,
+            GOD_CLASS,
             new ArenaClass("Tank", "Very beefy, helps your teammates safely deal damage.",
                     Icons.SHIELD, TextColor.color(0x6b8ebe), Material.IRON_CHESTPLATE,
                     new Kit(List.of(ItemStack.of(Material.WOODEN_SWORD).withTag(MELEE_TAG, 1)),
@@ -151,7 +158,7 @@ public final class MobArena implements SingleInstanceArena {
                             attribute.removeModifier(modifier);
                         }
                     }, level -> "Physical attacks now deal " + MathUtils.round(Math.pow(1.1, level) * 100 - 100, 2) + "% more damage",
-                    10, 1.1f, 20),
+                    0, 0.9f, 100),
             ALLOYING_UPGRADE
     );
 
@@ -162,6 +169,9 @@ public final class MobArena implements SingleInstanceArena {
 
     static final List<Generator<? extends Entity, MobGenerationContext>> MOB_GENERATORS = List.of(
             Generator.builder(ZombieMob::new)
+                    .chance(0.5)
+                    .build(),
+            Generator.builder(AngryPigMob::new)
                     .chance(0.5)
                     .build(),
             Generator.builder(SpiderMob::new)
@@ -438,7 +448,7 @@ public final class MobArena implements SingleInstanceArena {
     public void nextStage() {
         setStageInProgress(true);
         stage++;
-        initialMobCount = Math.min((int) (stage * 1.5) * (hasOption(MAYHEM_OPTION) ? 10 : 1), 200);
+        initialMobCount = Math.min((int) (stage * 100) * (hasOption(MAYHEM_OPTION) ? 10 : 1), 1000);
         for (Entity entity : arenaInstance.getEntities()) {
             if (entity instanceof NextStageNPC) {
                 entity.remove();
@@ -597,13 +607,21 @@ public final class MobArena implements SingleInstanceArena {
                                 !instance.getWorldBorder().isInside(pos) ||
                                 age >= 30) {
 
-                            explosion(DamageType.fromPlayer(player), instance, pos, 5, 0.5f, 7, 1);
+                            explosion(DamageType.fromPlayer(player), instance, pos, 10, 0.5f, 1000000, 1);
 
                             return TaskSchedule.stop();
                         }
 
                         instance.sendGroupedPacket(ParticleCreator.createParticlePacket(
                                 Particle.FIREWORK, true, pos.x(), pos.y(), pos.z(),
+                                0.3f, 0.3f, 0.3f, 0.01f, 50, null
+                        ));
+                        instance.sendGroupedPacket(ParticleCreator.createParticlePacket(
+                                Particle.SMOKE, true, pos.x(), pos.y(), pos.z(),
+                                0.3f, 0.3f, 0.3f, 0.01f, 50, null
+                        ));
+                        instance.sendGroupedPacket(ParticleCreator.createParticlePacket(
+                                Particle.SOUL_FIRE_FLAME, true, pos.x(), pos.y(), pos.z(),
                                 0.3f, 0.3f, 0.3f, 0.01f, 50, null
                         ));
                         instance.playSound(
