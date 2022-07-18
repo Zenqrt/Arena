@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.Minestom:Minestom:ad964a0")
+    implementation("com.github.Minestom:Minestom:d596992c0e")
     implementation("de.articdive:jnoise:3.0.2")
     implementation("io.prometheus:simpleclient:0.15.0")
     implementation("io.prometheus:simpleclient_hotspot:0.15.0")

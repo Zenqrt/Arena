@@ -52,6 +52,7 @@ public final class Lobby extends InstanceContainer {
 
     private Lobby() {
         super(UUID.randomUUID(), FullbrightDimension.INSTANCE);
+
         setChunkLoader(new AnvilLoader(Path.of("lobby")));
         setTimeRate(0);
 
